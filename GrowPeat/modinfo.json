@@ -3,9 +3,9 @@
     "modid": "growpeat",
     "name": "GrowPeat",
     "authors": [
-        "Unknown"
+        "Necromunger"
     ],
-    "description": "To be added",
+    "description": "Adds peatmix that can convert into peat",
     "version": "1.0.0",
     "dependencies": {
         "game": ""
