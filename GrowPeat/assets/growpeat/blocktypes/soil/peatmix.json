@@ -1,0 +1,83 @@
+{
+  "code": "peatmix",
+  // BlockSoilDeposit contains 1 method for setting the correct map color via GetBlockColor(), 1 method for generating soil below a deposit where needed and 1 method to make it grow grass
+  "class": "BlockSoilDeposit",
+  "entityClass": "PeatMix",
+  "variantgroups": [
+    {
+      "code": "grasscoverage",
+      "states": [ "none", "verysparse" ]
+    }
+  ],
+  "attributes": {
+    "mapColorCode": "land",
+    "ignoreTintInventory": true,
+    "growthBlockLayer": "l1soilwithgrass",
+    "growthLightLevel": 7,
+    "preventsDecay": true,
+    "tallGrassGrowthChance": 0.8,
+    "spreadsGrassByType": {
+      "*-none": false,
+      "*": true
+    },
+    "peatCureTimeDays": 4
+  },
+  "shape": { "base": "game:block/basic/cube" },
+  "drawtype": "TopSoil",
+  "renderpass": "TopSoil",
+  "creativeinventory": {
+    "general": [ "*" ],
+    "terrain": [ "*" ],
+    "flora": [ "*" ]
+  },
+  "blockmaterial": "Soil",
+  "replaceable": 700,
+  "resistance": 2,
+  "textures": {
+    "all": { "base": "growpeat:block/soil/peatmix" },
+    "snowed": { "base": "game:block/plant/grasscoverage/snow/normal" },
+    "specialSecondTexture": { "base": "game:block/plant/grasscoverage/{grasscoverage}" }
+  },
+  "texturesInventory": {
+    "down": { "base": "growpeat:block/soil/peatmix" },
+    "horizontals": {
+      "base": "growpeat:block/soil/peatmix",
+      "overlays": [ "game:block/plant/grasscoverage/inventory/side_{grasscoverage}" ]
+    },
+    "up": {
+      "base": "growpeat:block/soil/peatmix",
+      "overlays": [ "game:block/plant/grasscoverage/inventory/top_{grasscoverage}" ]
+    }
+  },
+  "climateColorMapByType": {
+    "*-none": null,
+    "*": "climatePlantTint"
+  },
+  "seasonColorMapByType": {
+    "*-none": null,
+    "*": "seasonalGrass"
+  },
+  "sounds": {
+    "place": "block/dirt",
+    "break": "block/dirt",
+    "hit": "block/dirt"
+  },
+  "frostable": true,
+  "fertility": 150,
+  "heldTpIdleAnimation": "holdbothhandslarge",
+  "heldRightReadyAnimation": "heldblockready",
+  "heldTpUseAnimation": "twohandplaceblock",
+  "tpHandTransform": {
+    "translation": {
+      "x": -1.23,
+      "y": -0.91,
+      "z": -0.8
+    },
+    "rotation": {
+      "x": -2,
+      "y": 25,
+      "z": -78
+    },
+    "scale": 0.4
+  }
+}
