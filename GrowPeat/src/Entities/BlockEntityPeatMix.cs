@@ -16,8 +16,6 @@ public class BlockEntityPeatMix : BlockEntity
 
     internal static Random rand = new Random();
     internal Block peatBlock;
-
-    internal float pastDays;
     internal float lastElapsedDays;
 
     internal ICoreServerAPI Sapi;

@@ -2,10 +2,10 @@
 	{
 		ingredientPattern: "A ,RG,S ",
 		ingredients: {
-            "A": { type: "item", code: "game:shovel-*", isTool: true  },
-			"R": { type: "item", code: "game:rot", quantity: 2 },
-			"G": { type: "item", code: "game:drygrass", quantity: 3 },
-			"S": { type: "block", code: "game:soil-medium-none"  }
+			"A": { type: "item", code: "game:shovel-*", isTool: true  },
+			"R": { type: "item", code: "game:rot", quantity: 4 },
+			"G": { type: "item", code: "game:drygrass", quantity: 6 },
+			"S": { type: "block", code: "game:soil-medium-none", quantity: 2  }
 		},
 		width: 2,
 		height: 3,
@@ -14,10 +14,10 @@
 	{
 		ingredientPattern: "A ,RG,S ",
 		ingredients: {
-            "A": { type: "item", code: "game:shovel-*", isTool: true  },
-			"R": { type: "item", code: "game:rot", quantity: 2 },
-			"G": { type: "item", code: "game:drygrass", quantity: 3 },
-			"S": { type: "block", code: "game:soil-low-none", quantity: 2  }
+			"A": { type: "item", code: "game:shovel-*", isTool: true  },
+			"R": { type: "item", code: "game:rot", quantity: 4 },
+			"G": { type: "item", code: "game:drygrass", quantity: 6 },
+			"S": { type: "block", code: "game:soil-low-none", quantity: 4  }
 		},
 		width: 2,
 		height: 3,
