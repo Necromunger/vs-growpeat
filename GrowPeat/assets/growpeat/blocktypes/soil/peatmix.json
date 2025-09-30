@@ -20,7 +20,7 @@
       "*-none": false,
       "*": true
     },
-    "peatCureTimeDays": 60
+    "peatCureTimeDays": 50
   },
   "shape": { "base": "game:block/basic/cube" },
   "drawtype": "TopSoil",

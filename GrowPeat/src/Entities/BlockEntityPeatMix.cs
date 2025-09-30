@@ -12,6 +12,7 @@ public class BlockEntityPeatMix : BlockEntity
     private float cureTimeDays;
     private float waterSaturatedDays;
     private bool isWaterSaturated;
+    private double dayWaterSaturated;
 
     internal static Random rand = new Random();
     internal Block peatBlock;
@@ -56,7 +57,20 @@ public class BlockEntityPeatMix : BlockEntity
 
     private void HandleWaterSaturation(float daysDt)
     {
-        isWaterSaturated = GetNearbyWaterDistance();
+        var checkWaterSaturated = GetNearbyWaterDistance();
+
+        if (!isWaterSaturated && checkWaterSaturated)
+        {
+            isWaterSaturated = true;
+            dayWaterSaturated = Api.World.Calendar.ElapsedDays;
+            Api.World.BlockAccessor.MarkBlockEntityDirty(Pos);
+        }
+        else if (isWaterSaturated && !checkWaterSaturated)
+        {
+            isWaterSaturated = false;
+            dayWaterSaturated = 0;
+            Api.World.BlockAccessor.MarkBlockEntityDirty(Pos);
+        }
 
         if (isWaterSaturated)
             waterSaturatedDays += daysDt;
@@ -65,9 +79,16 @@ public class BlockEntityPeatMix : BlockEntity
 
         // Swap block to peat after cure time
         if (waterSaturatedDays >= cureTimeDays)
+        {
             Api.World.BlockAccessor.SetBlock(peatBlock.Id, Pos);
+            Api.World.BlockAccessor.MarkBlockEntityDirty(Pos);
+        }
+    }
 
-        MarkDirty();
+    public override void OnBlockPlaced(ItemStack byItemStack = null)
+    {
+        if (Sapi != null)
+            HandleWaterSaturation(0);
     }
 
     public override void GetBlockInfo(IPlayer forPlayer, StringBuilder dsc)
@@ -76,8 +97,9 @@ public class BlockEntityPeatMix : BlockEntity
         {
             dsc.AppendLine("Water Saturated: Yes");
 
-            float timeRemaining = GameMath.Clamp(cureTimeDays - waterSaturatedDays, 0, cureTimeDays);
-            dsc.AppendLine($"Days until converted: {timeRemaining:0.0}");
+            var currentDay = (float)Api.World.Calendar.ElapsedDays;
+            float timeRemaining = GameMath.Clamp(((float)dayWaterSaturated + cureTimeDays) - currentDay, 0, cureTimeDays);
+            dsc.AppendLine($"Days till converted: {timeRemaining:0.0}");
         }
         else
         {
@@ -106,6 +128,7 @@ public class BlockEntityPeatMix : BlockEntity
     {
         base.FromTreeAttributes(tree, worldForResolving);
         waterSaturatedDays = tree.GetFloat("waterSaturatedDays");
+        dayWaterSaturated = tree.GetDouble("dayWaterSaturated");
         isWaterSaturated = tree.GetBool("isWaterSaturated");
     }
 
@@ -113,6 +136,7 @@ public class BlockEntityPeatMix : BlockEntity
     {
         base.ToTreeAttributes(tree);
         tree.SetFloat("waterSaturatedDays", waterSaturatedDays);
+        tree.SetDouble("dayWaterSaturated", dayWaterSaturated);
         tree.SetBool("isWaterSaturated", isWaterSaturated);
     }
 }
