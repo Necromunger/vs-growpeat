@@ -1,3 +1,5 @@
 {
-    "hello": "hello world!"
+    "growpeat:block-peatmix-none": "Peat Mix",
+    "growpeat:block-peatmix-verysparse": "Peat Mix (Sparse grass)",
+    "growpeat:blockdesc-peatmix-*": "Place beside or below water to create peat."
 }

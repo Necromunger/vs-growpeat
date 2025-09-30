@@ -1,25 +1,19 @@
-﻿using GrowPeat.Entities;
-using System;
+﻿using System;
 using System.Text;
 using Vintagestory.API.Common;
 using Vintagestory.API.Datastructures;
 using Vintagestory.API.MathTools;
 using Vintagestory.API.Server;
-using Vintagestory.GameContent;
 
 namespace GrowPeat.Behaviors;
 
 public class BlockEntityPeatMix : BlockEntity
 {
-    public static string ChannelName = "growpeat.peatmix";
-
     private float cureTimeDays;
     private float waterloggedTimeDays;
-    private float remainingDays;
     private bool waterSaturated;
 
-    protected static Random rand = new Random();
-
+    internal static Random rand = new Random();
     internal Block peatBlock;
 
     public override void Initialize(ICoreAPI api)
@@ -61,7 +55,7 @@ public class BlockEntityPeatMix : BlockEntity
 
     public override void OnBlockPlaced(ItemStack byItemStack = null)
     {
-        //waterloggedTimeDays = (float)Api.World.Calendar.ElapsedDays;
+        Update(0);
     }
 
     public override void GetBlockInfo(IPlayer forPlayer, StringBuilder dsc)
