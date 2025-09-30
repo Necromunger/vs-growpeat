@@ -10,63 +10,74 @@ namespace GrowPeat.Behaviors;
 public class BlockEntityPeatMix : BlockEntity
 {
     private float cureTimeDays;
-    private float waterloggedTimeDays;
-    private bool waterSaturated;
+    private float waterSaturatedDays;
+    private bool isWaterSaturated;
 
     internal static Random rand = new Random();
     internal Block peatBlock;
+
+    internal float pastDays;
+    internal float lastElapsedDays;
+
+    internal ICoreServerAPI Sapi;
 
     public override void Initialize(ICoreAPI api)
     {
         base.Initialize(api);
         cureTimeDays = Block.Attributes["peatCureTimeDays"].AsFloat(60);
 
-        if (api is ICoreServerAPI)
+        if (api is ICoreServerAPI sapi)
         {
+            Sapi = sapi;
             peatBlock = Api.World.GetBlock(new AssetLocation("game:peat-none"));
-            RegisterGameTickListener(Update, 10000 + rand.Next(500));
+            RegisterGameTickListener(ServerUpdate, 10000 + rand.Next(500));
         }
     }
 
-    private void Update(float dt)
+    private void ServerUpdate(float dt)
     {
-        var sapi = Api as ICoreServerAPI;
-        if (sapi == null || !sapi.World.IsFullyLoadedChunk(Pos))
+        if (Sapi == null || !Sapi.World.IsFullyLoadedChunk(Pos))
             return;
 
-        var isWaterlogged = GetNearbyWaterDistance();
-        if (!waterSaturated && isWaterlogged)
-        {
-            waterSaturated = isWaterlogged;
-            waterloggedTimeDays = (float)Api.World.Calendar.ElapsedDays;
-            MarkDirty();
-        }
-        else if (!isWaterlogged)
-        {
-            waterSaturated = isWaterlogged;
-            MarkDirty();
-        }
+        var elapsedDays = (float)Api.World.Calendar.ElapsedDays;
 
-        if (waterSaturated && (float)Api.World.Calendar.ElapsedDays > waterloggedTimeDays + cureTimeDays)
-        {
-            Api.World.BlockAccessor.SetBlock(peatBlock.Id, Pos);
-        }
+        if (lastElapsedDays == 0)
+            lastElapsedDays = elapsedDays;
+
+        // If world clock changed, handle invalid time
+        if (Api.World.Calendar.ElapsedDays < lastElapsedDays)
+            lastElapsedDays = elapsedDays;
+
+        var daysDelta = elapsedDays - lastElapsedDays;
+        HandleWaterSaturation(daysDelta);
+
+        lastElapsedDays = elapsedDays;
     }
 
-    public override void OnBlockPlaced(ItemStack byItemStack = null)
+    private void HandleWaterSaturation(float daysDt)
     {
-        Update(0);
+        isWaterSaturated = GetNearbyWaterDistance();
+
+        if (isWaterSaturated)
+            waterSaturatedDays += daysDt;
+        else
+            waterSaturatedDays = 0;
+
+        // Swap block to peat after cure time
+        if (waterSaturatedDays >= cureTimeDays)
+            Api.World.BlockAccessor.SetBlock(peatBlock.Id, Pos);
+
+        MarkDirty();
     }
 
     public override void GetBlockInfo(IPlayer forPlayer, StringBuilder dsc)
     {
-        if (waterSaturated)
+        if (isWaterSaturated)
         {
             dsc.AppendLine("Water Saturated: Yes");
 
-            var currentDay = (float)Api.World.Calendar.ElapsedDays;
-            float timeRemaining = GameMath.Clamp((waterloggedTimeDays + cureTimeDays) - currentDay, 0, cureTimeDays);
-            dsc.AppendLine($"Days till converted: {timeRemaining:0.0}");
+            float timeRemaining = GameMath.Clamp(cureTimeDays - waterSaturatedDays, 0, cureTimeDays);
+            dsc.AppendLine($"Days until converted: {timeRemaining:0.0}");
         }
         else
         {
@@ -94,14 +105,14 @@ public class BlockEntityPeatMix : BlockEntity
     public override void FromTreeAttributes(ITreeAttribute tree, IWorldAccessor worldForResolving)
     {
         base.FromTreeAttributes(tree, worldForResolving);
-        waterloggedTimeDays = tree.GetFloat("waterloggedTimeDays");
-        waterSaturated = tree.GetBool("waterSaturated");
+        waterSaturatedDays = tree.GetFloat("waterSaturatedDays");
+        isWaterSaturated = tree.GetBool("isWaterSaturated");
     }
 
     public override void ToTreeAttributes(ITreeAttribute tree)
     {
         base.ToTreeAttributes(tree);
-        tree.SetFloat("waterloggedTimeDays", waterloggedTimeDays);
-        tree.SetBool("waterSaturated", waterSaturated);
+        tree.SetFloat("waterSaturatedDays", waterSaturatedDays);
+        tree.SetBool("isWaterSaturated", isWaterSaturated);
     }
 }
